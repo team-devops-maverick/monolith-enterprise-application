@@ -11,6 +11,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -22,10 +23,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Table(name = "employee")
 public class Employee {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(length = 20, nullable = false)
