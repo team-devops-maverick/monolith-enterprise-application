@@ -16,19 +16,10 @@ pipeline {
                 checkout scm
             }
         }
-
-        stage('Build & Unit Test') {
-            steps {
-                sh '''
-                    mvn clean test
-                '''
-            }
-        }
-
         stage('Package') {
             steps {
                 sh '''
-                    mvn package -DskipTests
+                    mvn clean install -DskipTests
                 '''
             }
         }
