@@ -46,11 +46,11 @@ pipeline {
                     --password-stdin
 
                 docker tag \
-                    ${IMAGE_NAME}:${IMAGE_TAG} \
-                    ghcr.io/team-devops-maverick/snowman:${IMAGE_TAG}
+                    snowman:${BUILD_NUMBER} \
+                    ghcr.io/team-devops-maverick/snowman:${BUILD_NUMBER}
 
                 docker push \
-                    ghcr.io/team-devops-maverick/snowman:${IMAGE_TAG}
+                    ghcr.io/team-devops-maverick/snowman:${BUILD_NUMBER}
             '''
         }
     }
