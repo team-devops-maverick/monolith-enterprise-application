@@ -14,7 +14,7 @@ import java.net.URL;
 
 public class EnterpriseApplication {
 
-    private static final int DEFAULT_PORT = 8090;
+    private static final int DEFAULT_PORT = 8087;
 
     private EnterpriseApplication() {
     }

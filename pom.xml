@@ -11,7 +11,7 @@
     <properties>
     <spring.version>4.3.30.RELEASE</spring.version>
     <junit.version>4.13.1</junit.version>
-    <java.version>17</java.version>
+    <java.version>1.8</java.version>
     <mockito.version>1.10.19</mockito.version>
     <powermock.version>1.7.3</powermock.version>
 
@@ -37,8 +37,8 @@
     <slf4j.api.version>1.7.25</slf4j.api.version>
 
     <hibernate.core.version>5.4.24.Final</hibernate.core.version>
-    <hibernate.entitymanager.version>4.3.10.Final</hibernate.entitymanager.version>
-    <hibernate.c3po.version>4.3.10.Final</hibernate.c3po.version>
+    <hibernate.entitymanager.version>5.4.24.Final</hibernate.entitymanager.version>
+    <hibernate.c3po.version>5.4.24.Final</hibernate.c3po.version>
 
     <joda.time.version>2.9.9</joda.time.version>
     <ehcache.version>2.9.1</ehcache.version>

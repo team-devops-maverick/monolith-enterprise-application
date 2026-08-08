@@ -19,18 +19,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
 @Service
+@Transactional(readOnly = true)
 public class ClientServiceImpl implements ClientService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClientServiceImpl.class);
 
     private static final int MAX_RETRIES = 3;
-    private static final String URI = "http://localhost:8080/client-system/client/{clientId}/projects";
+    private static final String URI = "http://localhost:8087/client-system/client/{clientId}/projects";
 
     @Autowired
     private RestTemplate restTemplate;
@@ -38,34 +39,32 @@ public class ClientServiceImpl implements ClientService {
     @Autowired
     private ClientRepository clientRepository;
 
-    @Override
-    public Client getClient(int clientId) {
-        Client client = clientRepository.getClient(clientId);
+@Override
+public Client getClient(int clientId) {
+    Client client = clientRepository.getClient(clientId);
 
-        LOG.info("Retrieved client: {}", client);
+    LOG.info("Retrieved client: {}", client);
 
-        if (client.getProjects().isEmpty()) {
-            // call Client System REST endpoint to get its project data.
+    if (client.getProjects().isEmpty()) {
+        // call Client System REST endpoint to get its project data.
 
-            ResponseEntity<String> response = makeRequest();
+        ResponseEntity<String> response = makeRequest(clientId);
 
-            // retry
-            int retryCount = 0;
-            while(response.getStatusCode() != HttpStatus.OK) {
-                if (retryCount > MAX_RETRIES) {
-                    break;
-                }
-
-                response = makeRequest();
-                retryCount++;
+        int retryCount = 0;
+        while (response.getStatusCode() != HttpStatus.OK) {
+            if (retryCount > MAX_RETRIES) {
+                break;
             }
 
-            processResponse(response.getBody(), client);
+            response = makeRequest(clientId);
+            retryCount++;
         }
 
-        return client;
+        processResponse(response.getBody(), client);
     }
 
+    return client;
+}
     private void processResponse(String body, Client client) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -77,11 +76,9 @@ public class ClientServiceImpl implements ClientService {
            LOG.error("{}", e);
         }
     }
-
-    private ResponseEntity<String> makeRequest() {
-        return restTemplate.getForEntity(URI, String.class);
-    }
-
+private ResponseEntity<String> makeRequest(int clientId) {
+    return restTemplate.getForEntity(URI, String.class, clientId);
+}
     @Override
     public void createClient(Client client) throws SnowmanException {
 

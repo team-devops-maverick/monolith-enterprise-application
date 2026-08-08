@@ -1,15 +1,12 @@
-/*
- * |-------------------------------------------------
- * | Copyright © 2018 Colin But. All rights reserved.
- * |-------------------------------------------------
- */
 package com.mycompany.entapp.snowman.infrastructure.rest.endpoint;
 
 import com.mycompany.entapp.snowman.domain.exception.SnowmanException;
-import com.mycompany.entapp.snowman.infrastructure.rest.mappers.ClientResourceMapper;
-import com.mycompany.entapp.snowman.infrastructure.rest.resources.ClientResource;
 import com.mycompany.entapp.snowman.domain.model.Client;
 import com.mycompany.entapp.snowman.domain.service.ClientService;
+import com.mycompany.entapp.snowman.infrastructure.rest.mappers.ClientResourceMapper;
+import com.mycompany.entapp.snowman.infrastructure.rest.resources.ClientResource;
+
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +24,11 @@ public class ClientRestEndpoint {
 
     @RequestMapping(value = "/{clientId}", method = RequestMethod.GET)
     public ResponseEntity<ClientResource> getClientInfo(@PathVariable("clientId") Integer clientId) {
+
+        // Debug information
+        System.out.println("ClientService class = " + clientService.getClass().getName());
+        System.out.println("Is AOP Proxy = " + AopUtils.isAopProxy(clientService));
+
         Client client = clientService.getClient(clientId);
         ClientResource clientResource = ClientResourceMapper.mapToClientResource(client);
         return ResponseEntity.ok(clientResource);
