@@ -1,9 +1,9 @@
-FROM eclipse-temurin:17-jre
+FROM eclipse-temurin:8-jre
 
 WORKDIR /app
 
-COPY target/Snowman.jar app.jar
+COPY target/Snowman.jar /app/Snowman.jar
 
-EXPOSE 8087
+EXPOSE 8050
 
-ENTRYPOINT ["java", "-Dport=8087", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/Snowman.jar", "--server.port=8050"]
