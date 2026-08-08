@@ -3,7 +3,6 @@ pipeline {
     agent any
     tools {
         jdk 'JDK8'
-        maven 'Maven3'
     }
     environment {
         IMAGE_NAME = 'snowman'
