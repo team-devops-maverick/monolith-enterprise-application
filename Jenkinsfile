@@ -30,7 +30,7 @@ pipeline {
         '''
     }
 }
-        tage('Push Docker Image to GHCR') {
+        stage('Push Docker Image to GHCR') {
     steps {
         withCredentials([
             string(
