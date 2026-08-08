@@ -23,5 +23,37 @@ pipeline {
                 '''
             }
         }
+        stage('Docker Build') {
+    steps {
+        sh '''
+            docker build -t snowman:${BUILD_NUMBER} .
+        '''
+    }
+}
+        tage('Push Docker Image to GHCR') {
+    steps {
+        withCredentials([
+            string(
+                credentialsId: 'github-token',
+                variable: 'GITHUB_TOKEN'
+            )
+        ]) {
+            sh '''
+                set -e
+
+                echo "$GITHUB_TOKEN" | docker login ghcr.io \
+                    -u vinaykumarshetkar \
+                    --password-stdin
+
+                docker tag \
+                    ${IMAGE_NAME}:${IMAGE_TAG} \
+                    ghcr.io/team-devops-maverick/snowman:${IMAGE_TAG}
+
+                docker push \
+                    ghcr.io/team-devops-maverick/snowman:${IMAGE_TAG}
+            '''
+        }
+    }
+}
     }
 }
