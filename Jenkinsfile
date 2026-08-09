@@ -27,18 +27,17 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh '''
-                        mvn sonar:sonar \
-                          -Dsonar.projectKey=snowman \
-                          -Dsonar.projectName=Snowman
-                    '''
-                }
-            }
+      stage('SonarQube Analysis') {
+       steps {
+        withSonarQubeEnv('SonarQube') {
+            sh '''
+                mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                  -Dsonar.projectKey=snowman \
+                  -Dsonar.projectName=Snowman
+            '''
         }
-
+    }
+}
         stage('Quality Gate') {
             steps {
                 timeout(time: 5, unit: 'MINUTES') {
