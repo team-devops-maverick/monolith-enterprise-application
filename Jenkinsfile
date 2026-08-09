@@ -1,9 +1,8 @@
 pipeline {
-
     agent any
 
     tools {
-        jdk 'JDK8'
+        jdk 'JDK17'
     }
 
     environment {
@@ -19,6 +18,16 @@ pipeline {
             }
         }
 
+        stage('Check Java') {
+            steps {
+                sh '''
+                    echo "JAVA_HOME=$JAVA_HOME"
+                    java -version
+                    mvn -version
+                '''
+            }
+        }
+
         stage('Package') {
             steps {
                 sh '''
@@ -27,17 +36,18 @@ pipeline {
             }
         }
 
-      stage('SonarQube Analysis') {
-       steps {
-        withSonarQubeEnv('SonarQube') {
-            sh '''
-                mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-                  -Dsonar.projectKey=snowman \
-                  -Dsonar.projectName=Snowman
-            '''
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                        mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                          -Dsonar.projectKey=snowman \
+                          -Dsonar.projectName=Snowman
+                    '''
+                }
+            }
         }
-    }
-}
+
         stage('Quality Gate') {
             steps {
                 timeout(time: 5, unit: 'MINUTES') {
