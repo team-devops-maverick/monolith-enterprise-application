@@ -28,6 +28,28 @@ pipeline {
             }
         }
 
+        stage('Get Application Version') {
+            steps {
+                script {
+                    env.IMAGE_TAG = sh(
+                        script: '''
+                            mvn help:evaluate \
+                              -Dexpression=project.version \
+                              -q \
+                              -DforceStdout
+                        ''',
+                        returnStdout: true
+                    ).trim()
+
+                    if (!env.IMAGE_TAG) {
+                        error "Version not found in pom.xml"
+                    }
+
+                    echo "Application version: ${env.IMAGE_TAG}"
+                }
+            }
+        }
+
         stage('Package') {
             steps {
                 sh '''
@@ -40,9 +62,10 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh '''
-                    mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar\
-                    -Dsonar.projectKey=snowman \
-                    -Dsonar.projectName='snowman'
+                        mvn clean verify \
+                          org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                          -Dsonar.projectKey=snowman \
+                          -Dsonar.projectName=snowman
                     '''
                 }
             }
@@ -50,7 +73,7 @@ pipeline {
 
         stage('Quality Gate') {
             steps {
-                timeout(time: 5, unit: 'MINUTES') {
+                timeout(time: 10, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
             }
@@ -59,12 +82,13 @@ pipeline {
         stage('Docker Build') {
             steps {
                 sh '''
-                    docker build -t snowman:${BUILD_NUMBER} .
+                    docker build \
+                      -t ${IMAGE_NAME}:${IMAGE_TAG} .
                 '''
             }
         }
 
-        stage('Push Docker Image to GHCR') {
+        stage('Push Docker Image to ACR') {
             steps {
                 withCredentials([
                     usernamePassword(
@@ -75,11 +99,16 @@ pipeline {
                 ]) {
                     sh '''
                         set -e
-                 docker login myacr.azurecr.io \
-                          -u "$AZURE_CLIENT_ID" \
-                          -p "$AZURE_CLIENT_SECRET"
-                docker tag snowman:${BUILD_NUMBER} myacr.azurecr.io/snowman:${BUILD_NUMBER}
-                docker push myacr.azurecr.io/snowman:${BUILD_NUMBER}
+
+                        echo "$AZURE_CLIENT_SECRET" | docker login teammaverick.azurecr.io \
+                          --username "$AZURE_CLIENT_ID" \
+                          --password-stdin
+
+                        docker tag ${IMAGE_NAME}:${IMAGE_TAG} \
+                          teammaverick.azurecr.io/snowman:${IMAGE_TAG}
+
+                        docker push \
+                          teammaverick.azurecr.io/snowman:${IMAGE_TAG}
                     '''
                 }
             }
