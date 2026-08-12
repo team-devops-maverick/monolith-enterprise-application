@@ -59,8 +59,8 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh '''
-                        mvn sonar:sonar \
-                  -DskipTests \
+                mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                  -Dmaven.test.skip=true \
                   -Dsonar.projectKey=snowman \
                   -Dsonar.projectName=snowman
                     '''
