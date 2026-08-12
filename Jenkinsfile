@@ -40,9 +40,9 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh '''
-                        mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-                          -Dsonar.projectKey=snowman \
-                          -Dsonar.projectName=Snowman
+                    mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar\
+                    -Dsonar.projectKey=snowman \
+                    -Dsonar.projectName='snowman'
                     '''
                 }
             }
