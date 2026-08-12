@@ -9,15 +9,12 @@ pipeline {
         IMAGE_NAME = 'snowman'
         APP_PORT = '8050'
     }
-
     stages {
-
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
-
         stage('Check Java') {
             steps {
                 sh '''
