@@ -59,8 +59,13 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh '''
-                mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-                  -Dmaven.test.skip=true \
+                 export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+                export PATH="$JAVA_HOME/bin:$PATH"
+
+                java -version
+
+                mvn org.sonarsource.scanner.maven:sonar-maven-plugin:5.7.0.6970:sonar \
+                  -DskipTests \
                   -Dsonar.projectKey=snowman \
                   -Dsonar.projectName=snowman
                     '''
