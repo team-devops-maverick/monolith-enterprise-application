@@ -67,24 +67,19 @@ pipeline {
         stage('Push Docker Image to GHCR') {
             steps {
                 withCredentials([
-                    string(
-                        credentialsId: 'github-token',
-                        variable: 'GITHUB_TOKEN'
+                    usernamePassword(
+                        credentialsId: 'acr-service-principal',
+                        usernameVariable: 'AZURE_CLIENT_ID',
+                        passwordVariable: 'AZURE_CLIENT_SECRET'
                     )
                 ]) {
                     sh '''
                         set -e
-
-                        echo "$GITHUB_TOKEN" | docker login ghcr.io \
-                            -u vinaykumarshetkar \
-                            --password-stdin
-
-                        docker tag \
-                            snowman:${BUILD_NUMBER} \
-                            ghcr.io/team-devops-maverick/snowman:${BUILD_NUMBER}
-
-                        docker push \
-                            ghcr.io/team-devops-maverick/snowman:${BUILD_NUMBER}
+                 docker login myacr.azurecr.io \
+                          -u "$AZURE_CLIENT_ID" \
+                          -p "$AZURE_CLIENT_SECRET"
+                docker tag snowman:${BUILD_NUMBER} myacr.azurecr.io/snowman:${BUILD_NUMBER}
+                docker push myacr.azurecr.io/snowman:${BUILD_NUMBER}
                     '''
                 }
             }
