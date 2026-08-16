@@ -1,0 +1,24 @@
+trigger:
+- vinay-feature
+
+pool:
+  name: demo-agent-pool
+  demands:
+  - Agent.Name -equals windows-agent
+
+steps:
+
+- powershell: |
+    Write-Host "=== Agent Information ==="
+    Write-Host "Computer: $env:COMPUTERNAME"
+    Write-Host "Agent: $env:AGENT_NAME"
+
+    Write-Host "=== Java ==="
+    java -version
+
+    Write-Host "=== Maven ==="
+    mvn -version
+
+    Write-Host "=== Git ==="
+    git --version
+  displayName: 'Verify Build Agent'
