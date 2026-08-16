@@ -1,0 +1,19 @@
+trigger:
+- vinay-feature
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: |
+    java -version
+    mvn -version
+  displayName: 'Check Java and Maven'
+
+- task: Maven@4
+  displayName: 'Build Snowman'
+  inputs:
+    mavenPomFile: 'pom.xml'
+    goals: 'clean package'
+    publishJUnitResults: true
+    testResultsFiles: '**/surefire-reports/TEST-*.xml'
