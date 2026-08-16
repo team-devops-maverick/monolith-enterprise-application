@@ -2,23 +2,54 @@ trigger:
 - vinay-feature
 
 pool:
-  name: demo-agent-pool
-  demands:
-  - Agent.Name -equals windows-agent
+  name: Demo-Agent-Pool
+
+variables:
+  sonarServiceConnection: 'sonar-connection'
+  sonarProjectKey: 'Snowman'
+  sonarProjectName: 'Snowman'
 
 steps:
 
+- checkout: self
+  displayName: 'Checkout Code'
+
 - powershell: |
-    Write-Host "=== Agent Information ==="
-    Write-Host "Computer: $env:COMPUTERNAME"
-    Write-Host "Agent: $env:AGENT_NAME"
-
-    Write-Host "=== Java ==="
     java -version
-
-    Write-Host "=== Maven ==="
     mvn -version
+  displayName: 'Verify Java and Maven'
 
-    Write-Host "=== Git ==="
-    git --version
-  displayName: 'Verify Build Agent'
+- task: SonarQubePrepare@7
+  displayName: 'Prepare SonarQube Analysis'
+  inputs:
+    SonarQube: '$(sonarServiceConnection)'
+    scannerMode: 'other'
+    extraProperties: |
+      sonar.projectKey=$(sonarProjectKey)
+      sonar.projectName=$(sonarProjectName)
+      sonar.java.binaries=**/target/classes
+
+- task: Maven@4
+  displayName: 'Maven Build'
+  inputs:
+    mavenPomFile: 'pom.xml'
+    goals: 'clean package'
+    publishJUnitResults: true
+    testResultsFiles: '**/surefire-reports/TEST-*.xml'
+
+- task: SonarQubeAnalyze@7
+  displayName: 'Run SonarQube Analysis'
+  inputs:
+    jdkversion: 'JAVA_HOME_21_X64'
+
+- task: SonarQubePublish@7
+  displayName: 'Publish SonarQube Quality Gate'
+  inputs:
+    pollingTimeoutSec: '300'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Build Artifact'
+  inputs:
+    PathtoPublish: 'target'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
