@@ -51,6 +51,7 @@ pipeline {
             steps {
                 sh '''
                     mvn clean install -DskipTests
+                    mvn liquibase:update
                 '''
             }
         }
