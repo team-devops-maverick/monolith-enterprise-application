@@ -46,7 +46,7 @@ pipeline {
                 }
             }
         }
-/*
+
         stage('Package') {
             steps {
                 sh '''
@@ -54,6 +54,7 @@ pipeline {
                 '''
             }
         }
+/*
         stage('Docker Build') {
             steps {
                 sh '''
